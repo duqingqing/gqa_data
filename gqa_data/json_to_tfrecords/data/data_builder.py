@@ -8,75 +8,17 @@ import os
 
 import tensorflow as tf
 
-from visgen.base.base_data_builder import BaseDataBuilder
-from visgen.data.data_config import VisualGenomeDataConfig
-from visgen.data.data_loader import VisualGenomeDataLoader
-from visgen.data.data_utils import VisualGenomeDataUtils
-from visgen.feature.feature import FeatureManager
+from base.base_data_builder import BaseDataBuilder
+from data.data_config import VisualGenomeDataConfig
+from data.data_loader import VisualGenomeDataLoader
+from data.data_utils import VisualGenomeDataUtils
 
 data_config = VisualGenomeDataConfig()
 
 
-class VisualGenomeDataBuilder(BaseDataBuilder):
-
-    def __init__(self, data_config):
-        super(VisualGenomeDataBuilder, self).__init__(
-            data_config=data_config
-        )
-        self.data_loader = VisualGenomeDataLoader()
-        self.feature_manager = FeatureManager()
-        pass
-
-    def build_image_feature(self):
-        """
-            convert image data and visual feature into tfrecord format
-        :return:
-        """
-        data_gen = self.data_loader.load_images()
-        image_writer = tf.python_io.TFRecordWriter(self.data_config.image_feature_tf_file)
-        for batch, batch_data in enumerate(data_gen):
-            id_batch, shape_batch, image_raw_batch = batch_data
-            features = self.feature_manager.get_vgg_feature(image_batch=image_raw_batch)
-            for idx, id in enumerate(id_batch):
-                vgg_feature = features[idx]
-                tf_example = self._convert_image_to_tfexample(image_id=id, feature=vgg_feature)
-                image_writer.write(tf_example.SerializeToString())  # Serialize To String
-        image_writer.close()
-
-    def _convert_image_to_tfexample(self, image_id, feature):
-        features = tf.train.Features(feature={  # Non-serial data uses Feature
-            "image/image_id": self._int64_feature(image_id),
-            "image/vgg_feature": self._floats_feature(feature)
-        })
-        tf_example = tf.train.Example(features=features)
-        return tf_example
-
-    def build_region_feature(self):
-        """
-        Generate object visual feature for visual genome data set
-        All object feature data are saved into tfrecord format
-        :return:
-        """
-        data_gen = self.data_loader.load_regions()
-        for batch, batch_data in enumerate(data_gen):
-            for data in batch_data:
-                image_id = data.image_id
-                regions = data.regions
-                print(regions)
-
-                print(image_id)
-
-    def generate_object_features(self):
-        """
-        Generate object visual feature for visual genome data set
-        All object feature data are saved into tfrecord format
-        :return:
-        """
-
-
 class VisualGenomeRegionGraphDataBuilder(BaseDataBuilder):
     """
-    data builder for the scene graph of Visual Genome
+    data builder for the scene graph of GQA
     """
 
     def __init__(self, data_config):
@@ -136,10 +78,6 @@ class VisualGenomeRegionGraphDataBuilder(BaseDataBuilder):
 
 if __name__ == '__main__':
     data_config = VisualGenomeDataConfig()
-
-    # data_prepare = VisualGenomeDataBuilder(data_config)
-    # data_prepare.build_image_feature()
-
     region_data_prepare = VisualGenomeRegionGraphDataBuilder(data_config)
     region_data_prepare._build_data()
 

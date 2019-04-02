@@ -6,7 +6,7 @@ os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
 import tensorflow as tf
 from PIL import Image
 import numpy as np
-from FeatureToTfrecords import FeatureToTFrecords
+from scene_to_tfrecord import FeatureToTFrecords
 
 
 if __name__ == '__main__':

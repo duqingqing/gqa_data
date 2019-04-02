@@ -2,6 +2,7 @@ from getFeature import *
 import numpy as np
 import json
 from PIL import Image
+import pickle
 
 class GenerateFeatureFile(object):
 
@@ -42,8 +43,9 @@ class GenerateFeatureFile(object):
                 img = self.get_image(image_path)
 
                 all_features = extract_feature(model,img)
+
                 # 把numpy转为str
-                all_features_str =np.array_str(all_features)
+                all_features_str =np.array2string(all_features)
                 #把整张图片的特征放到item里
                 load_dict[item]['all_feature'] = all_features_str
 
@@ -56,17 +58,20 @@ class GenerateFeatureFile(object):
                     cropImg = self.cut_image(img,x,y,h,w)
                     bbox_feature=extract_feature(model,cropImg)
                     #把numpy转为str
-                    bbox_feature_str=np.array_str(bbox_feature)
+                    bbox_feature_str=np.array2string(bbox_feature)
                     #把bbox的特征放到object
                     objects[object]['bbox_feature']=bbox_feature_str
-        with open(self.Save_JSON_PAth+"%s.json"%self.picture_id, 'w') as f:
-                json.dump(load_dict, f)
+                    single_scene = {item:load_dict[item]}
+                with open(self.Save_JSON_PAth+"%s.json"%self.picture_id, 'w') as f:
+                    json.dump(single_scene, f)
+                    print("deal number %s picture"%self.picture_id)
+                    print("----------------------------------------")
 
 if __name__ == '__main__':
-    read_json_dir=''
-    image_dir=''
+    read_json_dir='/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/experiment/mac-network/data/sceneGraphs/train_sceneGraphs.json'
+    image_dir='/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/experiment/mac-network/data/images/'
     tfrecord_dir=''
-    json_save_dir=''
+    json_save_dir='/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/zutnlpcv/gqa_tfrecords/feature_json/'
     generateJson = GenerateFeatureFile()
     generateJson.set_path(read_json_dir,image_dir, tfrecord_dir,json_save_dir)
     generateJson.read_scene_graph()

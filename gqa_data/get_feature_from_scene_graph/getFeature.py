@@ -10,7 +10,11 @@ import torch.cuda
 import torchvision.transforms as transforms
 from PIL import Image
 import json
-from FeatureToTfrecords import FeatureToTFrecords
+from get_feature_from_scene_graph.scene_to_tfrecord import FeatureToTFrecords
+
+'''
+使用pytorch训练好的模型提取图片的特征
+'''
 
 img_to_tensor = transforms.ToTensor()
 
@@ -63,10 +67,6 @@ def store(data,json_file_dir):
         json_file.write(json.dumps(data))
 
 if __name__ == "__main__":
-    # lables =[]
-    # features = []
-    # batchsize = 3
-    # batch_num =1
     image_file="/home/dqq/图片/test_image/";
     tf_path = '/home/dqq/图片/feature'
     files = os.listdir(image_file)
@@ -74,15 +74,13 @@ if __name__ == "__main__":
     for i in range(file_count):
         fileName,fileType = files[i].split('.')
         lable = str.encode(fileName)
-        print("make image %s to tfrecords"%fileName)
+        print(fileName)
         print("--------------------------------------")
         model = make_model()
         image_path = image_file+fileName+'.'+fileType
         feature = extract_feature(model,image_path)
-        # features.append(feature)
-        # lables.append(lable)
-        tool = FeatureToTFrecords()
-        tool.save_tfrecords(feature,[lable],tf_path+"/%s.tfrecords"%(fileName))
+        # tool = FeatureToTFrecords()
+        # tool.save_tfrecords(feature,[lable],tf_path+"/%s.tfrecords"%(fileName))
     # data,lable =tool.load_tfrecords(srcfile="feature.tfrecords")
     # print(np.shape(data))
     # print(lable)

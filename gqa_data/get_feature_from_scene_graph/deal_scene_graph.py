@@ -1,16 +1,18 @@
-from getFeature import *
-import numpy as np
 import json
-from PIL import Image
-import pickle
 
+import numpy as np
+from PIL import Image
+
+from get_feature_from_scene_graph.getFeature import *
+
+'''
+把gqa数据中的scene_graph.json中对应图片的特征提取出来存为json 文件
+'''
 class GenerateFeatureFile(object):
 
-    def __int__(self,read_json_dir,image_dir, tfrecord_dir,json_save_dir):
-        self.read_json_path = read_json_dir
-        self.IMAGE_PATH = image_dir
-        self.TFRECORD_PATH = tfrecord_dir
-        self.Save_JSON_PAth = json_save_dir
+    def __int__(self):
+        pass
+
 
     def set_path(self,read_json_dir,image_dir, tfrecord_dir,json_save_dir):
         self.read_json_path = read_json_dir
@@ -45,7 +47,7 @@ class GenerateFeatureFile(object):
                 all_features = extract_feature(model,img)
 
                 # 把numpy转为str
-                all_features_str =np.array2string(all_features)
+                all_features_str = (np.array(all_features).tolist())
                 #把整张图片的特征放到item里
                 load_dict[item]['all_feature'] = all_features_str
 
@@ -58,7 +60,7 @@ class GenerateFeatureFile(object):
                     cropImg = self.cut_image(img,x,y,h,w)
                     bbox_feature=extract_feature(model,cropImg)
                     #把numpy转为str
-                    bbox_feature_str=np.array2string(bbox_feature)
+                    bbox_feature_str=np.array_str(bbox_feature)
                     #把bbox的特征放到object
                     objects[object]['bbox_feature']=bbox_feature_str
                     single_scene = {item:load_dict[item]}

@@ -47,7 +47,7 @@ def extract_feature(resmodel, img):
     if not color:
         img = img.convert('RGB')
     else:
-        print("image is color")
+        pass
     img = img.resize((224, 224))
     img_tensor = img_to_tensor(img)
     img_tensor = img_tensor.reshape(1, 3, 224, 224)

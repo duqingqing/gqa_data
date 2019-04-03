@@ -39,7 +39,7 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
         data_file = os.path.join(self.data_config.train_data_dir, 'scene_graph_train.tfrecords')
         data_writer = tf.python_io.TFRecordWriter(data_file)
         tf_batch = list()
-        batch_size = 1
+        batch_size = 100
         for batch, batch_datas in enumerate(scene_data_gen):
             for index, (image_id, image_data,image_object,image_width,image_height) in enumerate(batch_datas):
                 print('make number {} image`s scene-graph to tfrecords'.format(image_id))

@@ -1,10 +1,10 @@
 import os
 
 import numpy as np
-import skimage.color
-import skimage.io
+# import skimage.color
+# import skimage.io
 
-from visgen.data.data_config import VisualGenomeDataConfig
+from data.data_config import VisualGenomeDataConfig
 
 
 class VisualGenomeDataUtils(object):
@@ -25,17 +25,17 @@ class VisualGenomeDataUtils(object):
             self.image_dict[image_id] = image_raw
         return image_raw
 
-    def load_image(self, image_id):
-
-        """
-        load image data base on given image id
-        :param image_id: image id
-        :return: image data
-        """
-        current_image = skimage.io.imread(os.path.join(VisualGenomeDataConfig.image_dir, str(image_id) + ".jpg"))
-        if len(current_image.shape) == 2 or current_image.shape[2] == 1:  # this is to convert a gray to RGB image
-            current_image = skimage.color.gray2rgb(current_image)  #
-        return current_image
+    # def load_image(self, image_id):
+    #
+    #     """
+    #     load image data base on given image id
+    #     :param image_id: image id
+    #     :return: image data
+    #     """
+    #     current_image = skimage.io.imread(os.path.join(VisualGenomeDataConfig.image_dir, str(image_id) + ".jpg"))
+    #     if len(current_image.shape) == 2 or current_image.shape[2] == 1:  # this is to convert a gray to RGB image
+    #         current_image = skimage.color.gray2rgb(current_image)  #
+    #     return current_image
 
 
     def get_object_raw(self, object):

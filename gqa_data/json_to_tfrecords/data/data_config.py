@@ -10,7 +10,7 @@ from pathlib import Path
 home = str(Path.home())
 
 BATCH_SIZE = 40
-BASE_DATA_DIR = os.path.join(home, '/media/dqq/Seagate Backup Plus Drive/zutnlpData/Visualgenome/')  # base data dir"/home/liuxiaoming/data/visualgenome"
+BASE_DATA_DIR = os.path.join(home, '/home/dqq/下载/gqa_data/')  # base data dir"/home/liuxiaoming/data/visualgenome"
 PHRASE_MAX_LENGTH = 64
 
 TOKEN_BEGIN = '<s>'
@@ -39,6 +39,10 @@ class VisualGenomeDataConfig(object):
     relationships_json = os.path.join(base_data_dir, "relationships.json")
     region_descriptions_json = os.path.join(base_data_dir, "region_descriptions.json")
     region_graphs_json = os.path.join(base_data_dir, "region_graphs.json")
+
+    #json scene_graph data make dy dqq
+    scene_graphs_json = os.path.join(base_data_dir,"feature_json/")
+
 
     # for statistics
     statistics_dir = os.path.join(base_data_dir, "statistics")

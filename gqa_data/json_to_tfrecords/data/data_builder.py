@@ -92,14 +92,6 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
         tf_example = tf.train.Example(features=features)
         return  tf_example.SerializeToString()
 
-
-
-
-
-
-
-
-
 if __name__ == '__main__':
     data_config = VisualGenomeDataConfig()
     region_data_prepare = GQASceneGraphDataBuilder(data_config)

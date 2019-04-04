@@ -49,10 +49,10 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
                 if len(tf_batch) == batch_size:
                     self.__write_tf_examples(data_writer, tf_batch)
                     tf_batch = list()
-            if len(tf_batch) > 0:
-                self.__write_tf_examples(data_writer, tf_batch)
-            del tf_batch
-            pass
+        if len(tf_batch) > 0:
+            self.__write_tf_examples(data_writer, tf_batch)
+        del tf_batch
+        pass
 
 
     def _to_tf_example(self, data):
@@ -76,7 +76,6 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
             object_feature = image_object[object]["bbox_feature"]
             single_object = [object_id,object_name,object_h,object_w,object_x,object_y,object_attributes,object_relations,object_feature]
             object_list.append(single_object)
-        print(len(object_list))
         object_list_np_data = np.asarray(object_list)
         object_list_np_bytes = object_list_np_data.tobytes()
 

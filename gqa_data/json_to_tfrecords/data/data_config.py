@@ -9,7 +9,7 @@ from pathlib import Path
 
 home = str(Path.home())
 
-BATCH_SIZE = 40
+BATCH_SIZE = 100
 BASE_DATA_DIR = os.path.join(home, '/home/dqq/下载/gqa_data/')  # base data dir"/home/liuxiaoming/data/visualgenome"
 PHRASE_MAX_LENGTH = 64
 

@@ -5,7 +5,7 @@ from __future__ import print_function
 from __future__ import unicode_literals  # compatible with python3 unicode coding
 
 import os
-
+import time
 import ijson
 import tensorflow as tf
 
@@ -29,14 +29,18 @@ class VisualGenomeDataLoader(object):
     def load_scenegraph(self,filename):
         file_path = os.path.join(self.config.scene_graphs_json,filename)
         image_id = filename.split('.')[0]
-        with open(file_path,mode='rb') as f:
-            image_data_gen = ijson.items(f, "%s"%image_id)
-            for image_gen in image_data_gen:
-                image_data = image_gen['all_feature']
-                image_object = image_gen['objects']
-                image_width = int(image_gen['width'])
-                image_height = int(image_gen['height'])
-                data = (image_id, image_data,image_object,image_width,image_height)
+        data = ()
+        try:
+            with open(file_path,mode='rb') as f:
+                image_data_gen = ijson.items(f, "%s"%image_id)
+                for image_gen in image_data_gen:
+                    image_data = image_gen['all_feature']
+                    image_object = image_gen['objects']
+                    image_width = int(image_gen['width'])
+                    image_height = int(image_gen['height'])
+                    data = (image_id, image_data,image_object,image_width,image_height)
+        except ijson.common.IncompleteJSONError as error:
+            print('except: ijson.common.IncompleteJSONError')
         return data
 
 
@@ -45,7 +49,10 @@ class VisualGenomeDataLoader(object):
         files = os.listdir(self.config.scene_graphs_json)
         for filename in files:
             batch_data = self.load_scenegraph(filename)
-            batch_contain.append(batch_data)
+            if len(batch_data)>0 :
+                batch_contain.append(batch_data)
+            else:
+                continue
             if len(batch_contain) == self.config.batch_size:
                 yield batch_contain
                 batch_contain = []
@@ -71,34 +78,23 @@ class VisualGenomeDataLoader(object):
     #             yield batch_data
     #         del batch_data
 
-
-    # def load_object_class_count(self, min_class_num, max_class_num):
-    #     """
-    #         load class count in objects {$class_name:$class_count}
-    #             between min_class_num and max_class_num object instances
-    #     :param min_class_num:
-    #     :param max_class_num:
-    #     :return:
-    #     """
-    #     class_count_file = os.path.join(self.config.statistics_dir, 'classes_instance_count.txt')
-    #     class_count_dict = dict()
-    #     with open(file=class_count_file, mode='r', encoding='utf-8') as f:
-    #         lines = f.readlines()
-    #         for l in lines:
-    #             splits = str.split(l, '\t')
-    #             class_name = splits[0]
-    #             class_num = int(splits[1])
-    #             if min_class_num <= class_num <= max_class_num:
-    #                 class_count_dict[class_name] = class_num
-    #     return class_count_dict
-
 if __name__ == '__main__':
 
     data_loader = VisualGenomeDataLoader()
     scene_data_gen = data_loader.batch_load_scenegraph()
     for batch, batch_datas in enumerate(scene_data_gen):
-       for index, (image_id, image_data,image_object) in enumerate(batch_datas):
-                for object in image_object:
-                    print(image_object[object])
+         print(len(batch_datas[0]))
+        # if len(batch_datas[0])>0:
+        #     for batch_index, (image_id, image_data, image_object,image_width,image_height) in enumerate(batch_datas):
+        #         print(image_id)
+        #         print(image_width)
+        #         print(image_height)
+        #         print('-------------------------------------------')
+        # else:
+        #     continue
+
+
+
+
 
 

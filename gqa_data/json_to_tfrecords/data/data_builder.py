@@ -44,6 +44,7 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
             for index, (image_id, image_data,image_object,image_width,image_height) in enumerate(batch_datas):
                 print('make number {} image`s scene-graph to tfrecords'.format(image_id))
                 data = (image_id, image_data, image_object,image_width,image_height)
+                print("the file to example is {}".format(image_id))
                 tf_example = self._to_tf_example(data)
                 tf_batch.append(tf_example)
                 if len(tf_batch) == batch_size:
@@ -63,9 +64,20 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
         """
         image_id, image_data, image_object,image_width,image_height = data
         image_data = np.asarray(image_data)
-        object_list = list()
+        #object
+
+        object_id_list = list()
+        object_name_list = list()
+        object_x_list = list()
+        object_y_list = list()
+        object_h_list = list()
+        object_w_list = list()
+        object_attributes_list = list()
+        object_relations_list = list()
+        object_bbox_feature_list = list()
+
         for object in image_object:
-            object_id = object
+            object_id = int(object)
             object_name = image_object[object]["name"]
             object_h = image_object[object]["h"]
             object_w = image_object[object]["w"]
@@ -74,10 +86,23 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
             object_attributes = image_object[object]["attributes"]
             object_relations = image_object[object]["relations"]
             object_feature = image_object[object]["bbox_feature"]
-            single_object = [object_id,object_name,object_h,object_w,object_x,object_y,object_attributes,object_relations,object_feature]
-            object_list.append(single_object)
-        object_list_np_data = np.asarray(object_list)
-        object_list_np_bytes = object_list_np_data.tobytes()
+            #填充数据
+            object_id_list.append(object_id)
+            object_name_list.append(object_name)
+            object_x_list.append(int(object_x))
+            object_y_list.append(int(object_y))
+            object_h_list.append(int(object_h))
+            object_w_list.append(int(object_w))
+            object_attributes_list.append(object_attributes)
+            object_relations_list.append(object_relations)
+            object_bbox_feature_list.append(object_feature)
+        print("------------------------------")
+        print("object id len = {} ,object name len = {}".format(len(object_id_list),len(object_name_list)))
+
+        object_name_nparray = np.asarray(object_name_list)
+        object_attributes_nparray = np.asarray(object_attributes_list)
+        object_relations_nparray = np.asarray(object_relations_list)
+        object_feature_nparray = np.asarray(object_bbox_feature_list)
 
         features = tf.train.Features(feature={
             # image data
@@ -86,7 +111,19 @@ class GQASceneGraphDataBuilder(BaseDataBuilder):
             'image/width': dataset_util.int64_feature(image_width),
             'image/feature': dataset_util.bytes_feature(image_data.tobytes()),
             # object
-            'image/object_list': dataset_util.bytes_feature(object_list_np_bytes),
+            'image/object_id': dataset_util.int64_list_feature(object_id_list),
+
+            'image/object_name':dataset_util.bytes_feature(object_name_nparray.tobytes()),
+
+            'image/object_x':dataset_util.int64_list_feature(np.asarray(object_x_list)),
+            'image/object_y': dataset_util.int64_list_feature(np.asarray(object_y_list)),
+            'image/object_w': dataset_util.int64_list_feature(np.asarray(object_w_list)),
+            'image/object_h': dataset_util.int64_list_feature(np.asarray(object_h_list)),
+
+            'image/object_attributes': dataset_util.bytes_feature(object_attributes_nparray.tobytes()),
+            'image/object_relations': dataset_util.bytes_feature(object_relations_nparray.tobytes()),
+            'image/object_feature': dataset_util.bytes_feature(object_feature_nparray.tobytes())
+
         })
         tf_example = tf.train.Example(features=features)
         return  tf_example.SerializeToString()

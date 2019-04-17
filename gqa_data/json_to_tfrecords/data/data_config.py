@@ -10,7 +10,7 @@ from pathlib import Path
 home = str(Path.home())
 
 BATCH_SIZE = 100
-BASE_DATA_DIR = os.path.join(home, '/home/dqq/下载/gqa_data/')  # base data dir"/home/liuxiaoming/data/visualgenome"
+BASE_DATA_DIR = os.path.join(home, '/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/zutnlpcv/gqa_tfrecords/')  # base data dir"/home/liuxiaoming/data/visualgenome"
 PHRASE_MAX_LENGTH = 64
 
 TOKEN_BEGIN = '<s>'

@@ -36,9 +36,10 @@ class VisualGenomeDataLoader(object):
                 for image_gen in image_data_gen:
                     image_data = image_gen['all_feature']
                     image_object = image_gen['objects']
+                    questions = image_gen['questions']
                     image_width = int(image_gen['width'])
                     image_height = int(image_gen['height'])
-                    data = (image_id, image_data,image_object,image_width,image_height)
+                    data = (image_id, image_data,image_object,image_width,image_height,questions)
         except ijson.common.IncompleteJSONError as error:
             print('except: ijson.common.IncompleteJSONError')
         return data

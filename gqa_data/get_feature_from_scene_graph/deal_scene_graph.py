@@ -14,11 +14,12 @@ class GenerateFeatureFile(object):
         pass
 
 
-    def set_path(self,read_json_dir,image_dir, tfrecord_dir,json_save_dir):
+    def set_path(self,read_json_dir,image_dir, question_json_dir,json_save_dir,new_json_save_dir):
         self.read_json_path = read_json_dir
         self.IMAGE_PATH = image_dir
-        self.TFRECORD_PATH = tfrecord_dir
+        self.question_path =question_json_dir
         self.Save_JSON_PAth = json_save_dir
+        self.new_json_save_path = new_json_save_dir
 
     def set_picture_id(self,picture_id):
         self.picture_id = picture_id
@@ -69,11 +70,56 @@ class GenerateFeatureFile(object):
                     print("deal number %s picture"%self.picture_id)
                     print("----------------------------------------")
 
+    #向制定image_id对应的json文件添加question
+    def add_question_to_scenegraph(self,image_id,questions_data):
+        #打开现有的scene_graph数据
+        try:
+            with open(self.Save_JSON_PAth+"%s.json"%image_id,'r') as load_f:
+                load_dict = json.loads(load_f.read())
+                for item in load_dict:
+                    #添加一个问题字段
+                    load_dict[item]['questions'] = questions_data
+                    single_scene = {item: load_dict[item]}
+                    #保存到新的文件中
+                    with open(self.new_json_save_path+"%s.json"%image_id, 'w') as f:
+                        json.dump(single_scene, f)
+                        print("make number %s picture"%image_id)
+                        print("----------------------------------------")
+        except:
+            print("%s.json is not exist"%image_id)
+            pass
+
+
+    def write_question_to_scenegraph(self):
+        question_json_collects = []  # 用来装载同一个image的问题数据
+        image_mark = 0 #标记当前的图片id
+        stepcount = 0 #标记循环的开始
+        with open(self.question_path,'r') as question_file:
+            question_datas = json.loads(question_file.read())
+            questions = question_datas['questions']
+            for question_item in questions :
+                imageId = question_item['imageId']
+                if stepcount==0:
+                    image_mark = imageId
+                    question_json_collects.append(question_item)
+                    stepcount=stepcount+1
+                else:
+                    if imageId==image_mark:
+                        question_json_collects.append(question_item)
+                    else:
+                        #到此一个图片的所有问题在list中了，进行保存
+                        self.add_question_to_scenegraph(image_mark,question_json_collects)
+                        image_mark = imageId
+                        question_json_collects = []
+                        question_json_collects.append(question_item)
+
+
 if __name__ == '__main__':
     read_json_dir='/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/experiment/mac-network/data/sceneGraphs/train_sceneGraphs.json'
     image_dir='/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/experiment/mac-network/data/images/'
-    tfrecord_dir=''
+    question_json_dir='/home/dqq/下载/gqa_data/all_val_data.json'
     json_save_dir='/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/zutnlpcv/gqa_tfrecords/feature_json/'
+    new_json_save_dir = '/media/zutnlp/49741bd8-e3dd-4326-bf71-0394aa198e95/zutnlpcv/gqa_tfrecords/new_feature_json/'
     generateJson = GenerateFeatureFile()
-    generateJson.set_path(read_json_dir,image_dir, tfrecord_dir,json_save_dir)
-    generateJson.read_scene_graph()
+    generateJson.set_path(read_json_dir,image_dir, question_json_dir,json_save_dir,new_json_save_dir)
+    generateJson.write_question_to_scenegraph()
